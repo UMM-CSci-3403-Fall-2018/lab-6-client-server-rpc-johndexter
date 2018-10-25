@@ -1,6 +1,13 @@
 package xrate;
 
-import java.io.IOException;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Provide access to basic currency exchange rate services.
@@ -8,6 +15,8 @@ import java.io.IOException;
  * @author PUT YOUR TEAM NAME HERE
  */
 public class ExchangeRateReader {
+
+    public String baseURL;
 
     /**
      * Construct an exchange rate reader using the given base URL. All requests
@@ -17,10 +26,10 @@ public class ExchangeRateReader {
      * year, month, and day; the URL for 25 June 2010, for example, would be
      * http://api.finance.xaviermedia.com/api/2010/06/25.xml
      * 
-     * @param baseURL
+     * @param url
      *            the base URL for requests
      */
-    public ExchangeRateReader(String baseURL) {
+    public ExchangeRateReader(String url) throws MalformedURLException {
         // TODO Your code here
         /*
          * DON'T DO MUCH HERE!
@@ -28,6 +37,8 @@ public class ExchangeRateReader {
          * the two methods below. All you need to do here is store the
          * provided `baseURL` in a field so it will be accessible later.
          */
+
+        this.baseURL = url;
     }
 
     /**
@@ -47,7 +58,24 @@ public class ExchangeRateReader {
      */
     public float getExchangeRate(String currencyCode, int year, int month, int day) throws IOException {
         // TODO Your code here
-        throw new UnsupportedOperationException();
+        String toMonth = String.valueOf(month);
+        String toDay = String.valueOf(day);
+
+        if (month < 10) toMonth = '0' + toMonth;
+        if (day < 10) toDay = '0' + toDay;
+
+        baseURL = baseURL + year + '-' + toMonth + '-' + toDay;
+        URL url = new URL(baseURL);
+        InputStream inputStream = url.openStream();
+        //Reader reader = new BufferedReader(inputStream);
+        JsonParser parser = new JsonParser();
+        JsonObject jsonObject = (JsonObject)parser.parse(new InputStreamReader(inputStream));
+        JsonObject rates = jsonObject.getAsJsonObject("rates");
+        float rate = rates.get(currencyCode).getAsFloat();
+
+
+        return rate;
+        //throw new UnsupportedOperationException();
     }
 
     /**

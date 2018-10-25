@@ -11,7 +11,7 @@ import org.xml.sax.SAXException;
 import static org.junit.Assert.*;
 
 public class ExchangeRateTest {
-    private static final String NICS_DUMMY_DATA_URL = "http://www.morris.umn.edu/~mcphee/ExchangeRateData/";
+    private static final String NICS_DUMMY_DATA_URL = "http://facultypages.morris.umn.edu/~mcphee/ExchangeRateData/";
     private static final double DELTA = 0.0001;
 
     @Test
@@ -39,7 +39,7 @@ public class ExchangeRateTest {
     public void checkZAR20100909() throws IOException, ParserConfigurationException, SAXException {
         ExchangeRateReader xrReader = new ExchangeRateReader(NICS_DUMMY_DATA_URL);
         float rate = xrReader.getExchangeRate("ZAR", 2010, 9, 9);
-        assertEquals(9.196400, rate, DELTA);
+        assertEquals(9.165675, rate, DELTA);
     }
     
     @Test
