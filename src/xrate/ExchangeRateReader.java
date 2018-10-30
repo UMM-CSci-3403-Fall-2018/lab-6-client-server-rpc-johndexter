@@ -1,12 +1,9 @@
 package xrate;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 
@@ -25,16 +22,10 @@ public class ExchangeRateReader {
 
 
     public ExchangeRateReader(String url) throws IOException {
-        // TODO Your code here
-        /*
-         * DON'T DO MUCH HERE!
-         * People often try to do a lot here, but the action is actually in
-         * the two methods below. All you need to do here is store the
-         * provided `baseURL` in a field so it will be accessible later.
-         */
 
         this.baseURL = url;
         readAccessKeys();
+        
     }
     /**
      * This reads the `fixer_io` access key from `etc/access_keys.properties`
@@ -92,7 +83,6 @@ public class ExchangeRateReader {
         baseURL = baseURL + year + '-' + toMonth + '-' + toDay + "?access_key=" + accessKey;
         URL url = new URL(baseURL);
         InputStream inputStream = url.openStream();
-        //Reader reader = new BufferedReader(inputStream);
         JsonParser parser = new JsonParser();
         JsonObject jsonObject = (JsonObject)parser.parse(new InputStreamReader(inputStream));
         JsonObject rates = jsonObject.getAsJsonObject("rates");
@@ -120,7 +110,7 @@ public class ExchangeRateReader {
      * @throws IOException
      */
     public float getExchangeRate(String fromCurrency, String toCurrency, int year, int month, int day) throws IOException {
-        // TODO Your code here
+  
         String toMonth = String.valueOf(month);
         String toDay = String.valueOf(day);
 
