@@ -8,28 +8,23 @@ import com.google.gson.JsonParser;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Properties;
+
 
 /**
  * Provide access to basic currency exchange rate services.
  * 
- * @author PUT YOUR TEAM NAME HERE
+ * @author john schonebaum, zihan an
  */
 public class ExchangeRateReader {
 
     public String baseURL;
 
-    /**
-     * Construct an exchange rate reader using the given base URL. All requests
-     * will then be relative to that URL. If, for example, your source is Xavier
-     * Finance, the base URL is http://api.finance.xaviermedia.com/api/ Rates
-     * for specific days will be constructed from that URL by appending the
-     * year, month, and day; the URL for 25 June 2010, for example, would be
-     * http://api.finance.xaviermedia.com/api/2010/06/25.xml
-     * 
-     * @param url
-     *            the base URL for requests
-     */
-    public ExchangeRateReader(String url) throws MalformedURLException {
+    //https://github.com/UMM-CSci-Systems/Currency-exchange-RPC/blob/master/src/xrate/ExchangeRateReader.java
+    private String accessKey;
+
+
+    public ExchangeRateReader(String url) throws IOException {
         // TODO Your code here
         /*
          * DON'T DO MUCH HERE!
@@ -39,6 +34,36 @@ public class ExchangeRateReader {
          */
 
         this.baseURL = url;
+        readAccessKeys();
+    }
+    /**
+     * This reads the `fixer_io` access key from `etc/access_keys.properties`
+     * and assigns it to the field `accessKey`.
+     *
+     * @throws IOException if there is a problem reading the properties file
+     */
+    private void readAccessKeys() throws IOException {
+        Properties properties = new Properties();
+        FileInputStream in = null;
+        try {
+            // Don't ch85ac0c3f21231a61ccc8acccac77b422ange this filename unless you know what you're doing.
+            // It's crucial that we don't commit the file that contains the
+            // (private) access keys. This file is listed in `.gitignore` so
+            // it's safe to put keys there as we won't accidentally commit them.
+            in = new FileInputStream("etc/access_keys.properties");
+        } catch (FileNotFoundException e) {
+            /*
+             * If this error gets generated, make sure that you have the desired
+             * properties file in your project's `etc` directory. You may need
+             * to rename the file ending in `.sample` by removing that suffix.
+             */
+            System.err.println("Couldn't open etc/access_keys.properties; have you renamed the sample file?");
+            throw (e);
+        }
+        properties.load(in);
+        // This assumes we're using Fixer.io and that the desired access key is
+        // in the properties file in the key labelled `fixer_io`.
+        accessKey = properties.getProperty("fixer_io");
     }
 
     /**
@@ -57,14 +82,14 @@ public class ExchangeRateReader {
      * @throws IOException
      */
     public float getExchangeRate(String currencyCode, int year, int month, int day) throws IOException {
-        // TODO Your code here
+
         String toMonth = String.valueOf(month);
         String toDay = String.valueOf(day);
 
         if (month < 10) toMonth = '0' + toMonth;
         if (day < 10) toDay = '0' + toDay;
 
-        baseURL = baseURL + year + '-' + toMonth + '-' + toDay;
+        baseURL = baseURL + year + '-' + toMonth + '-' + toDay + "?access_key=" + accessKey;
         URL url = new URL(baseURL);
         InputStream inputStream = url.openStream();
         //Reader reader = new BufferedReader(inputStream);
@@ -73,9 +98,8 @@ public class ExchangeRateReader {
         JsonObject rates = jsonObject.getAsJsonObject("rates");
         float rate = rates.get(currencyCode).getAsFloat();
 
-
         return rate;
-        //throw new UnsupportedOperationException();
+
     }
 
     /**
@@ -103,7 +127,7 @@ public class ExchangeRateReader {
         if (month < 10) toMonth = '0' + toMonth;
         if (day < 10) toDay = '0' + toDay;
 
-        baseURL = baseURL + year + '-' + toMonth + '-' + toDay;
+        baseURL = baseURL + year + '-' + toMonth + '-' + toDay + "?access_key=" + accessKey;
         URL url = new URL(baseURL);
         InputStream inputStream = url.openStream();
         JsonParser parser = new JsonParser();
@@ -114,6 +138,5 @@ public class ExchangeRateReader {
 
         return rate01/rate02;
 
-        //throw new UnsupportedOperationException();
     }
 }
