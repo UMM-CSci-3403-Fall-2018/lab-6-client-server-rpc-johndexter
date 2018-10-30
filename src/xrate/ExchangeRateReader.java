@@ -95,10 +95,25 @@ public class ExchangeRateReader {
      * @return the desired exchange rate
      * @throws IOException
      */
-    public float getExchangeRate(
-            String fromCurrency, String toCurrency,
-            int year, int month, int day) throws IOException {
+    public float getExchangeRate(String fromCurrency, String toCurrency, int year, int month, int day) throws IOException {
         // TODO Your code here
-        throw new UnsupportedOperationException();
+        String toMonth = String.valueOf(month);
+        String toDay = String.valueOf(day);
+
+        if (month < 10) toMonth = '0' + toMonth;
+        if (day < 10) toDay = '0' + toDay;
+
+        baseURL = baseURL + year + '-' + toMonth + '-' + toDay;
+        URL url = new URL(baseURL);
+        InputStream inputStream = url.openStream();
+        JsonParser parser = new JsonParser();
+        JsonObject jsonObject = (JsonObject)parser.parse(new InputStreamReader(inputStream));
+        JsonObject rates = jsonObject.getAsJsonObject("rates");
+        float rate01 = rates.get(fromCurrency).getAsFloat();
+        float rate02 = rates.get(toCurrency).getAsFloat();
+
+        return rate01/rate02;
+
+        //throw new UnsupportedOperationException();
     }
 }
